@@ -138,76 +138,81 @@ void filecopy(FILE *ifp, FILE *ofp)
 	int c, i;
     char word[MAXWORD], *word1, buf[BUFSIZ];
 
-	while (getftoken(ifp, word, MAXWORD) != EOF) {
+	if (C_FILE || PY_FILE) {
+		while (getftoken(ifp, word, MAXWORD) != EOF) {
 
-switch_token:
-		switch (tokentype) {
-			case NAME:
-        		// fprintf(stderr, "\t%s\t", word);
-        		if (is_keyword(word)) {
-				    fprintf(ofp, "%s%s%s", KEYWORD_COLOR, word, RESET);
-					break;
-        		} else if (is_typename(word)) {
-					fprintf(ofp, "%s%s%s", TYPENAME_COLOR, word, RESET);
-					break;
-				} else if (is_all_caps(word)) {
-					fprintf(ofp, "%s%s%s", CAP_NAME_COLOR, word, RESET);
-					break;
-				} else if (isupper(word[0])) {
-					fprintf(ofp, "%s%s%s", CAP_NAME_COLOR, word, RESET);
-					break;
-				}
+			switch_token:
+			switch (tokentype) {
+				case NAME:
+    	    		// fprintf(stderr, "\t%s\t", word);
+    	    		if (is_keyword(word)) {
+					    fprintf(ofp, "%s%s%s", KEYWORD_COLOR, word, RESET);
+						break;
+    	    		} else if (is_typename(word)) {
+						fprintf(ofp, "%s%s%s", TYPENAME_COLOR, word, RESET);
+						break;
+					} else if (is_all_caps(word)) {
+						fprintf(ofp, "%s%s%s", CAP_NAME_COLOR, word, RESET);
+						break;
+					} else if (isupper(word[0])) {
+						fprintf(ofp, "%s%s%s", CAP_NAME_COLOR, word, RESET);
+						break;
+					}
 
 
-				strcpy(buf, word);
-				while (getftoken(ifp, word, MAXWORD) == SPACE) {
-					strcat(buf, word);
-				}
-				if (tokentype == LPAREN) {
-					fprintf(ofp, "%s%s%s", FNAME_COLOR, buf, RESET);
+					strcpy(buf, word);
+					while (getftoken(ifp, word, MAXWORD) == SPACE) {
+						strcat(buf, word);
+					}
+					if (tokentype == LPAREN) {
+						fprintf(ofp, "%s%s%s", FNAME_COLOR, buf, RESET);
+						word1 = BRAC_COLORS[get_brac_color_index(tokentype)];
+    	    			fprintf(ofp, "%s%s%s", word1, word, RESET);
+						break;
+					} else {
+						fprintf(ofp, "%s%s%s", NAME_COLOR, buf, RESET);
+						goto switch_token;
+					}
+					break;
+				case DIGIT:
+					fprintf(ofp, "%s%s%s", DIGIT_COLOR, word, RESET);
+					break;
+				case STRING:
+				case C_CHAR:
+					fprintf(ofp, "%s%s%s", STRING_COLOR, word, RESET);
+					break;
+				case LPAREN: case LCURLY: case LBRACKET:
+				case RPAREN: case RCURLY: case RBRACKET:
 					word1 = BRAC_COLORS[get_brac_color_index(tokentype)];
-        			fprintf(ofp, "%s%s%s", word1, word, RESET);
+					fprintf(ofp, "%s%s%s", word1, word, RESET);
 					break;
-				} else {
-					fprintf(ofp, "%s%s%s", NAME_COLOR, buf, RESET);
-					goto switch_token;
-				}
-				break;
-			case DIGIT:
-				fprintf(ofp, "%s%s%s", DIGIT_COLOR, word, RESET);
-				break;
-			case STRING:
-			case C_CHAR:
-				fprintf(ofp, "%s%s%s", STRING_COLOR, word, RESET);
-				break;
-			case LPAREN: case LCURLY: case LBRACKET:
-			case RPAREN: case RCURLY: case RBRACKET:
-				word1 = BRAC_COLORS[get_brac_color_index(tokentype)];
-				fprintf(ofp, "%s%s%s", word1, word, RESET);
-				break;
-			case PUNCT:
-				fprintf(ofp, "%s%s%s", PUNCT_COLOR, word, RESET);
-				break;
-			case OTHERS: case SPACE:
-				fprintf(ofp, "%s%s%s", OTHERS_COLOR, word, RESET);
-				break;
-			case COMMENT:
-				fprintf(ofp, "%s%s%s", COMMENT_COLOR, word, RESET);
-				break;
-			case C_PREPROCESSOR_INI:
-				strcpy(buf, word);
-				getftoken(ifp, word, MAXWORD);
-				if (tokentype == NAME) {
-				    fprintf(ofp, "%s%s%s%s", KEYWORD_COLOR, buf, word, RESET);
-				} else {
-					fprintf(ofp, "%s%s%s", PUNCT_COLOR, buf, RESET);
-					goto switch_token;
-				}
-				break;
-			default:
-				fprintf(ofp, "%c", tokentype);
-				break;
+				case PUNCT:
+					fprintf(ofp, "%s%s%s", PUNCT_COLOR, word, RESET);
+					break;
+				case OTHERS: case SPACE:
+					fprintf(ofp, "%s%s%s", OTHERS_COLOR, word, RESET);
+					break;
+				case COMMENT:
+					fprintf(ofp, "%s%s%s", COMMENT_COLOR, word, RESET);
+					break;
+				case C_PREPROCESSOR_INI:
+					strcpy(buf, word);
+					getftoken(ifp, word, MAXWORD);
+					if (tokentype == NAME) {
+					    fprintf(ofp, "%s%s%s%s", KEYWORD_COLOR, buf, word, RESET);
+					} else {
+						fprintf(ofp, "%s%s%s", PUNCT_COLOR, buf, RESET);
+						goto switch_token;
+					}
+					break;
+				default:
+					fprintf(ofp, "%c", tokentype);
+					break;
+			}
 		}
+	} else {
+		while ((c = getc(ifp)) != EOF)
+		putc(c, ofp);
 	}
 
 }
