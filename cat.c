@@ -5,14 +5,8 @@
 
 #define		MAXWORD				1024
 #define		BUFSIZ				2048
-#define		RED					"\x1B[38;2;255;0;0m"
-#define		GRN					"\x1B[38;2;0;255;0m"
 #define		YEL					"\x1B[38;2;255;255;0m"
-#define		BLU					"\x1B[38;2;153;230;255m"
-#define		MAG					"\x1B[38;2;255;0;255m"
-#define		CYN					"\x1B[38;2;0;255;255m"
 #define		WHT					"\x1B[38;2;255;255;255m"
-#define		BRN					"\x1B[38;2;168;96;40m"
 #define		DEFAULT				"\x1B[39m"
 #define		RESET				"\x1B[0m"
 
@@ -56,9 +50,9 @@ int tokentype = 0;
 char *BRAC_COLORS[] = {
 	"\x1B[38;2;230;128;230m",
 	"\x1B[38;2;0;230;172m",
-	YEL,
+	"\x1B[38;2;247;247;110m",
 	"\x1B[38;2;153;230;255m",
-	MAG
+	"\x1B[38;2;77;210;255m"
 };
 
 int BRAC_COLORS_LEN = 4;
@@ -66,7 +60,6 @@ int BRAC_COLORS_LEN = 4;
 int ENCOUNTERED_BRACES[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 void filecopy(FILE *ifp, FILE *ofp);
-// int getftok(FILE *fp, char *word, int lim);
 int getftoken(FILE *fp, char *token, int lim);
 int get_brac_color_index(int brace_type);
 int is_keyword(char *s);
