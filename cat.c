@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include "keyword.c.h"
 #include "keyword.py.h"
 
@@ -89,7 +90,7 @@ int is_all_caps(char *s);
 /* flag for different kind of file */
 int C_FILE = 0, PY_FILE = 0;
 
-main (int argc, char *argv[])
+int main (int argc, char *argv[])
 {
 	FILE *fp;
 	char *prog = argv[0];			/* program name for errors */
@@ -317,7 +318,7 @@ int getftoken(FILE *fp, char *token, int lim)
 		ungetc(c, fp);
 		tokentype = DIGIT;
 	} else if (isalpha(c) || c == '_') {	/* it starts a name */
-		for (*p++ = c; isalnum(c = getc(fp)) || c == '_' && --lim > 1; )	/* read until the end of the number */
+		for (*p++ = c; isalnum(c = getc(fp)) || (c == '_' && --lim > 1); )	/* read until the end of the number */
 			*p++ = c;
 		*p = '\0';
 		ungetc(c, fp);
